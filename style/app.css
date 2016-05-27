@@ -7,13 +7,12 @@ body {
 
 .wrapper {
 	width: 1051px;
-  height: auto;
 	margin: 300px auto;
 	text-align: center;
 }
 
 .one, .two, .three {
-	width: 33.3%;
+	width: 33.3% !important;
 	float: left;
 	margin-bottom: 20px;
 }
@@ -42,6 +41,11 @@ body {
 
 .center {
 	text-align: center;
+}
+
+.button-center {
+  width: 200px;
+  margin: 0px auto;
 }
 
 .checkbox {

@@ -2,10 +2,11 @@ window.onload = function() {
   var button = document.getElementsByClassName('add-more')[0];
   if(button){
     button.addEventListener("click", function(){
-      addRow();
+      callJsonAndAddRow();
     });
   }
 
+  // при клике выполняем функцию скрола вверх
   var up = document.getElementById('arrowsup')
   if(up) {
     up.addEventListener("click", function(){
@@ -18,23 +19,17 @@ window.onload = function() {
     checkbox.addEventListener("click", function(){
       if(this.checked) {
         infiniteScroll({callback: function(done) {
-          // 1. сделать запрос к БЕ
-          XHRequest({
-            path: 'http://localhost:3000/items.json',
-            complete: function(resp) {
-              // 2. вставить результаты на страницу
-              addRow(JSON.parse(resp));
-              // 3. вызвать ф-ию done когда мы закончили
-              done();
-            }
-          })
+          callJsonAndAddRow(done);
+          hideButton();
         }});
       } else {
         infiniteScroll({callback: function(done) { }});
+        showButton();
       }
     });
   }
 
+  // делаем пошаговую плавную прокрутку вверх
   function scrollToTop(scrollDuration) {
     var scrollStep = -window.scrollY / (scrollDuration / 15);
       scrollInterval = setInterval(function(){
@@ -44,6 +39,17 @@ window.onload = function() {
       	else clearInterval(scrollInterval); 
   		},15);
   };
+
+  // скрываем кнопку Показать еще
+  function hideButton(){
+    document.getElementsByClassName('button-center')[0].style.display="none";
+  }
+
+  // показываем кнопку Показать еще
+  function showButton(){
+   document.getElementsByClassName('button-center')[0].style.display="block"; 
+  }
+
 
   function addRow(items) {
     var row = document.createElement('div');
@@ -59,7 +65,7 @@ window.onload = function() {
         <div class="inner">\
           <div class="inner-body">\
             <img src="'+items[i].image+'" alt="">\
-            <img src="img/stars.png" alt="">\
+            <div class="stars"><img src="img/stars.png" alt=""></div>\
             <div class="inner-body__title">'+items[i].title+'</div>\
             <div class="inner-body__description">'+items[i].paragraph+'</div>\
           </div>\
@@ -72,6 +78,21 @@ window.onload = function() {
     // добавить дочерний элемент в DOM
     container.appendChild(row);
   };
+
+  function callJsonAndAddRow(done) {
+    // 1. сделать запрос к БЕ
+    XHRequest({
+      path: 'http://localhost:3000/items.json',
+      complete: function(resp) {
+        // 2. вставить результаты на страницу
+        addRow(JSON.parse(resp));
+        // 3. вызвать ф-ию done когда мы закончили
+        if(typeof done === 'function') {
+          done();
+        }
+      }
+    })
+  }
 
   function XHRequest(options) {
     xhr = new XMLHttpRequest();
